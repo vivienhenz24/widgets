@@ -20,7 +20,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@oxc-node/cli": "^0.0.34",
+    "@oxc-node/cli": "^0.0.35",
     "@tsconfig/node-lts": "^24.0.0",
     "@tsconfig/strictest": "^2.0.8",
     "@types/node": "^24.10.1",

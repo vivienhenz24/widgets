@@ -78,21 +78,25 @@ const OrasPushOutputSchema = z.object({
   referenceAsTags: z.array(z.string()),
 });
 
-const RegistryIndexWidgetSchema = z.object({
+const RegistryEntryReleaseSchema = z.object({
+  version: z.string(),
+  publishedAt: z.string(),
+  digest: z.string(),
+});
+
+const RegistryEntrySchema = z.object({
   handle: z.string(),
   id: z.string(),
   name: z.string(),
   authors: z.string(), // JSON-stringified array of authors
   description: z.string(),
-  versions: z
-    .array(z.tuple([/* version */ z.string(), /* digest */ z.string()]))
-    .min(1),
+  releases: z.array(RegistryEntryReleaseSchema).min(1),
 });
 
 const RegistryIndexSchema = z.object({
   api: z.int(),
-  generated: z.string(),
-  widgets: z.array(RegistryIndexWidgetSchema),
+  generatedAt: z.string(),
+  widgets: z.array(RegistryEntrySchema),
 });
 
 export async function parsePublisher(entry: string, commit: string) {
@@ -157,5 +161,6 @@ export type WidgetManifest = z.infer<typeof WidgetManifestSchema>;
 export type PublishPlanEntry = z.infer<typeof PublishPlanEntrySchema>;
 export type PublishPlan = z.infer<typeof PublishPlanSchema>;
 export type OrasPushOutput = z.infer<typeof OrasPushOutputSchema>;
-export type RegistryIndexWidget = z.infer<typeof RegistryIndexWidgetSchema>;
+export type RegistryEntryRelease = z.infer<typeof RegistryEntryReleaseSchema>;
+export type RegistryEntry = z.infer<typeof RegistryEntrySchema>;
 export type RegistryIndex = z.infer<typeof RegistryIndexSchema>;

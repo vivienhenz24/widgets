@@ -52,21 +52,35 @@ for (const it of publishPlan) {
   console.log("::endgroup::");
   console.log(`::notice::Published: https://${remote}@${pushResult.digest}`);
 
-  registryUpdatePlan.push({ ...it, digest: pushResult.digest });
+  let publishedAt = new Date().toISOString();
+  const createdAt =
+    pushResult.annotations?.["org.opencontainers.image.created"];
+  if (createdAt !== undefined) {
+    publishedAt = createdAt;
+  }
+
+  registryUpdatePlan.push({ ...it, publishedAt, digest: pushResult.digest });
 }
 
 const now = new Date();
 await fs.mkdir(REGISTRY_DIR, { recursive: true });
 const registryIndex = await parseRegistryIndex(REGISTRY_DIR);
-registryIndex.generated = now.toISOString();
+registryIndex.api = 1;
+registryIndex.generatedAt = now.toISOString();
 
 console.log("Updating registry index...");
 
 for (const it of registryUpdatePlan) {
-  const { handle, id, widget, manifest, digest } = it;
+  const { handle, id, widget, manifest, publishedAt, digest } = it;
   let entry = registryIndex.widgets.find(
     (e) => e.handle === handle && e.id === id,
   );
+
+  const releaseData = {
+    version: widget.version,
+    publishedAt,
+    digest,
+  };
 
   if (entry === undefined) {
     entry = {
@@ -75,7 +89,7 @@ for (const it of registryUpdatePlan) {
       name: manifest.name,
       authors: JSON.stringify(manifest.authors),
       description: manifest.description,
-      versions: [[widget.version, digest]],
+      releases: [releaseData],
     };
     registryIndex.widgets.push(entry);
     console.log(`::group::[${handle}/${id}] Added new entry`);
@@ -87,7 +101,7 @@ for (const it of registryUpdatePlan) {
   entry.name = manifest.name;
   entry.authors = JSON.stringify(manifest.authors);
   entry.description = manifest.description;
-  entry.versions.unshift([widget.version, digest]); // Prepend new version
+  entry.releases.unshift(releaseData); // Prepend new release
   console.log(`::group::[${handle}/${id}] Updated entry`);
   console.log(entry);
   console.log("::endgroup::");

@@ -89,7 +89,6 @@ for (const it of registryUpdatePlan) {
       name: manifest.name,
       authors: manifest.authors,
       description: manifest.description,
-      homepage: manifest.homepage,
       releases: [releaseData],
     };
     registryIndex.widgets.push(entry);

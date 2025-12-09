@@ -1,0 +1,5 @@
+quantum-field-easter:
+  version: 0.1.0-alpha.0
+  repo: https://github.com/vivienhenz24/deskulpt-widgets.git
+  commit: bb62f380a745ed3884f849d6b1bc24594676ca41
+  path: quantum-field-easter
